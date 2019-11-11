@@ -260,10 +260,10 @@ public class DriveTrain {
         double Angle = Math.atan2(x1,y1) + Math.PI/4;
         double rot = x2;
 
-        final double lf = r * Math.cos(Angle) + rot;
-        final double lb = r * Math.sin(Angle) + rot;
-        final double rf = r * Math.sin(Angle) - rot;
-        final double rb = r * Math.cos(Angle) - rot;
+        final double lf =  r * Math.cos(Angle) + rot;
+        final double lb =  r * Math.sin(Angle) + rot;
+        final double rf =  r * Math.sin(Angle) - rot;
+        final double rb =  r * Math.cos(Angle) - rot;
 
         leftFrontMotor.setPower(lf);
         leftBackMotor.setPower(lb);

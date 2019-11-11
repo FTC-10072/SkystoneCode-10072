@@ -9,7 +9,7 @@ public class Arm {
     private LinearOpMode currentOpMode;
 
     private Servo gripperServo;
-    private DcMotor intakeMotor1, intakeMotor2;
+    private DcMotor intakeMotor1, intakeMotor2, worstMotor;
     //private Servo catchServo;
 
 
@@ -20,6 +20,7 @@ public class Arm {
         gripperServo = robot.gripperServo;
         intakeMotor1 = robot.intakeMotor1;
         intakeMotor2 = robot.intakeMotor2;
+        worstMotor   = robot.worstMotor;
         gripperServo.setPosition(1);
 
 
@@ -28,12 +29,24 @@ public class Arm {
     }
 
     public void runIntake(double power){
-        intakePower(.8);
+        intakePower(power);
 
     }
 
+
+    public void moveArmUp(double speed){
+        speed = Math.abs(speed);
+        worstMotor.setPower(speed);
+    }
+
+    public void moveArmDown(double speed){
+        speed = Math.abs(speed);
+        worstMotor.setPower(-speed);
+    }
+
+
     public void reverseIntake(double power){
-        intakePower(-.8);
+        intakePower(-power);
     }
 
     public void stopIntake(){
@@ -42,7 +55,7 @@ public class Arm {
 
     public void intakePower(double power){
         intakeMotor1.setPower(power);
-        intakeMotor2.setPower(-power);
+        intakeMotor2.setPower(power);
     }
 
 

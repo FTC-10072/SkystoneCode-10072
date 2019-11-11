@@ -52,7 +52,7 @@ public class TeleOpController extends LinearOpMode {
             leftStickX  = direction * gamepad1.left_stick_x;
             rightStickX = direction * gamepad1.right_stick_x;
 
-            if (gamepad1.a && gamepad1.b){
+            if (gamepad1.x){
                 direction *= -1;
             }
 
@@ -69,6 +69,29 @@ public class TeleOpController extends LinearOpMode {
                 arm.dropgripper();
             }
 
+            if (gamepad2.right_bumper){
+                arm.runIntake(.8);
+            }
+
+            if (gamepad2.left_bumper){
+                arm.reverseIntake(.8);
+            }
+
+            if(gamepad2.right_trigger > .25 || gamepad1.left_trigger > .25){
+                arm.stopIntake();
+            }
+
+            if(gamepad2.dpad_up){
+                arm.moveArmDown(.8);
+            }
+
+            else if(gamepad2.dpad_down){
+                arm.moveArmUp(.8);
+            }
+
+            else{
+                arm.moveArmDown(0);
+            }
 
         }
     }

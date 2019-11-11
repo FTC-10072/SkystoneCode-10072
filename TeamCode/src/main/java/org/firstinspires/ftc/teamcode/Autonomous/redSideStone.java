@@ -8,8 +8,8 @@ import org.firstinspires.ftc.teamcode.RobotClasses.Arm;
 import org.firstinspires.ftc.teamcode.RobotClasses.DriveTrain;
 import org.firstinspires.ftc.teamcode.RobotClasses.HardwareRobot;
 
-@Autonomous(name = "Blue Side Auto", group = "Auto")
-public class JustMoveForwardPlease extends LinearOpMode {
+@Autonomous(name = "red Side Stone", group = "Auto")
+public class redSideStone extends LinearOpMode {
     private HardwareRobot robot = new HardwareRobot();
     private DriveTrain driveTrain = new DriveTrain();
     private Arm arm = new Arm();
@@ -22,25 +22,8 @@ public class JustMoveForwardPlease extends LinearOpMode {
         arm.init(robot, this);
         waitForStart();
 
-        driveTrain.strafeToDistance(22,.8,4);
-        driveTrain.driveToDistance(-30,5,1);
-        arm.dropgripper();
-        sleep(500);
-        driveTrain.driveToDistance(35,5,.5);
-        arm.raisegripper();
-        driveTrain.strafeToDistance(-22,.8,5);
-        driveTrain.driveToDistance(-28,3,.5);
-        driveTrain.turnToDegree(-115, 1, 3);
-        driveTrain.driveToDistance(-26,3,.6);
-        driveTrain.driveToDistance(3,1,.6);
-
-
-        sleep(500);
-        driveTrain.turnToDegree(35,1,4);
-        driveTrain.turnToDegree(180,1,3);
-        sleep(500);
-        driveTrain.driveToDistance(26,5,1);
-
-        driveTrain.stop();
+        driveTrain.driveToDistance(-18,3,.8);
+        driveTrain.turnToDegree(-90,.5,4);
+        driveTrain.driveToDistance(-24,4,.8);
     }
 }

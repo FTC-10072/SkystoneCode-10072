@@ -37,6 +37,7 @@ public class redSideTray extends LinearOpMode {
 
         sleep(500);
         driveTrain.turnToDegree(-35,1,4);
+        driveTrain.turnToDegree(180,1,3);
         sleep(500);
         driveTrain.driveToDistance(26,5,1);
 

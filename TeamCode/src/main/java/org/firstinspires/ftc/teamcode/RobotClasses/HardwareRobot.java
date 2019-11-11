@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class HardwareRobot {
 
-    public DcMotor leftFrontMotor, leftBackMotor, rightFrontMotor, rightBackMotor,intakeMotor1, intakeMotor2;
+    public DcMotor leftFrontMotor, leftBackMotor, rightFrontMotor, rightBackMotor,intakeMotor1, intakeMotor2, worstMotor;
 
     public Servo gripperServo, move1Servo, move2Servo;
     public BNO055IMU imu;
@@ -29,6 +29,8 @@ public class HardwareRobot {
         rightBackMotor     = hwMap.get(DcMotor.class,"right_motor_2");
         intakeMotor1       = hwMap.get(DcMotor.class, "intake_motor_1");
         intakeMotor2       = hwMap.get(DcMotor.class, "intake_motor_2");
+        worstMotor         = hwMap.get(DcMotor.class, "worst_motor");
+
 
 
 
@@ -40,6 +42,7 @@ public class HardwareRobot {
         rightBackMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMotor1.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+        worstMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         // positive is clockwise/up, negative is anticlockwise/down
 
 
@@ -49,6 +52,7 @@ public class HardwareRobot {
         rightBackMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intakeMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        worstMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         leftFrontMotor.setPower(0);
@@ -57,6 +61,7 @@ public class HardwareRobot {
         rightBackMotor.setPower(0);
         intakeMotor1.setPower(0);
         intakeMotor2.setPower(0);
+        worstMotor.setPower(0);
 
 
         leftFrontMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -65,6 +70,8 @@ public class HardwareRobot {
         rightBackMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        worstMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
 
 
         leftFrontMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -73,14 +80,15 @@ public class HardwareRobot {
         rightBackMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intakeMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        worstMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
 
         // set up servos
 
-        gripperServo = hwMap.get(Servo.class, "Gripper_Servo");
-        move1Servo = hwMap.get(Servo.class, "Move_1_Servo");
-        move2Servo = hwMap.get(Servo.class, "Move_2_Servo");
+        gripperServo = hwMap.get(Servo.class, "gripper_servo");
+        move1Servo = hwMap.get(Servo.class, "move_1_servo");
+        move2Servo = hwMap.get(Servo.class, "move_2_servo");
 
 
         gripperServo.setPosition(1);
