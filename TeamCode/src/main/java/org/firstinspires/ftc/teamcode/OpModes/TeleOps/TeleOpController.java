@@ -57,7 +57,8 @@ public class TeleOpController extends LinearOpMode {
             }
 
             // drive train
-            driveTrain.mecanumDrive(leftStickX, leftStickY, rightStickX);
+            //driveTrain.mecanumDrive(leftStickX, leftStickY, rightStickX);
+            driveTrain.arcadeDrive(leftStickY, rightStickX, leftStickX);
 
             //move the gripper
 

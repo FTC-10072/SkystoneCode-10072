@@ -12,17 +12,20 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.teamcode.RobotClasses.colorSensor;
 
 public class DriveTrain {
 
     private LinearOpMode currentOpMode;
-    private DcMotor leftFrontMotor, leftBackMotor, rightFrontMotor, rightBackMotor;
+    private DcMotor leftFrontMotor, leftBackMotor, rightFrontMotor, rightBackMotor, horiMotor;
 
     private BNO055IMU imu;
     private Orientation lastAngles = new Orientation();
     Orientation angles;
     Acceleration gravity;
     private double globalAngle;
+
+    colorSensor rSense = new colorSensor();
 
     // Ku = 0.105
     // Tu = .866
@@ -45,11 +48,13 @@ public class DriveTrain {
     public DriveTrain(){}
 
     public void init(HardwareRobot robot, LinearOpMode opMode){
-        currentOpMode = opMode;
-        leftFrontMotor = robot.leftFrontMotor;
-        leftBackMotor = robot.leftBackMotor;
+        currentOpMode   = opMode;
+        leftFrontMotor  = robot.leftFrontMotor;
+        leftBackMotor   = robot.leftBackMotor;
         rightFrontMotor = robot.rightFrontMotor;
-        rightBackMotor = robot.rightBackMotor;
+        rightBackMotor  = robot.rightBackMotor;
+        horiMotor       = robot.horiMotor;
+
 
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -120,6 +125,7 @@ public class DriveTrain {
         if (currentOpMode.opModeIsActive()) {
             int cpr = (int) (COUNTS_PER_INCH * .9);
             int move = distance * cpr;
+            double mechDrift = .9;
 
             int newLeftFrontTarget = leftFrontMotor.getCurrentPosition() + move;
             int newLeftBackTarget = leftBackMotor.getCurrentPosition() - move;
@@ -142,10 +148,10 @@ public class DriveTrain {
                     && leftFrontMotor.isBusy() && leftBackMotor.isBusy()
                     && rightFrontMotor.isBusy() && rightBackMotor.isBusy()) {
                 // set power with correction
-                leftFrontMotor.setPower(speed);
+                leftFrontMotor.setPower(mechDrift * speed);
                 rightFrontMotor.setPower(speed);
                 leftBackMotor.setPower(speed);
-                rightBackMotor.setPower(speed);
+                rightBackMotor.setPower(mechDrift * speed);
             }
             if (time.seconds() > timeout){
                 return false;
@@ -225,10 +231,22 @@ public class DriveTrain {
     }
 
 
+    public void driveToStone(){
+
+        //while red is greater than 15 keep on moving
+        while (rSense.checkColor()){
+            leftFrontMotor.setPower(1);
+            leftBackMotor.setPower(1);
+            rightFrontMotor.setPower(1);
+            rightBackMotor.setPower(1);
+        }
+
+    }
 
 
 
-    public void arcadeDrive(double move, double turn){
+
+    public void arcadeDrive(double move, double turn, double strafe){
         move = boundValue(move);
         move = deadband(move, DEADBAND);
         turn = boundValue(turn);
@@ -246,9 +264,12 @@ public class DriveTrain {
             right /= max;
         }
 
+        horiMotor.setPower(strafe);
+
         // Output the safe vales to the motor drives.
         setLeftPower(left, MAX_DRIVE_SPEED);
         setRightPower(right, MAX_DRIVE_SPEED);
+
     }
 
 
@@ -276,17 +297,14 @@ public class DriveTrain {
 
     public void mecanumDriveFieldCentric(double x1, double y1, double x2){
         double lx =  x1 , ly = y1;
-        double v  =  Math.sqrt(lx*lx + ly*ly);
+        double r  =  Math.hypot(x1, y1);
 
         double currAngle = Math.atan2(lx, ly);
 
         double current = Math.toRadians(getAngle());
 
 
-
-        double r = Math.hypot(x1,x2);
-
-        double Angle = Math.atan2(x1,x2) + Math.PI/4;
+        double Angle = currAngle + current;
         double rot = x2;
 
         final double lf = r * Math.cos(Angle) + rot;
