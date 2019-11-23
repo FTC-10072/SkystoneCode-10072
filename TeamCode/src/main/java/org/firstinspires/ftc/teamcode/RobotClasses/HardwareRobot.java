@@ -17,7 +17,7 @@ public class HardwareRobot {
 
     public Servo gripperServo, move1Servo, move2Servo;
     public BNO055IMU imu;
-    public ModernRoboticsI2cColorSensor rSense;
+    public ModernRoboticsI2cColorSensor rSensor;
 
     HardwareMap hwMap = null;
     private ElapsedTime period = new ElapsedTime();
@@ -105,7 +105,7 @@ public class HardwareRobot {
         move1Servo.setPosition(.5);
         move2Servo.setPosition(.5);
 
-        rSense = hwMap.get(ModernRoboticsI2cColorSensor.class, "rSense");
+        rSensor = hwMap.get(ModernRoboticsI2cColorSensor.class, "rSense");
 
 
 

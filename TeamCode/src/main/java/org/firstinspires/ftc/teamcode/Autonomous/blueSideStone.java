@@ -25,10 +25,11 @@ public class blueSideStone extends LinearOpMode {
         arm.init(robot, this);
         waitForStart();
 
-        colorSensor.lightOn();
+        /*colorSensor.lightOn();
 
 
         driveTrain.driveToStone();
-        colorSensor.lightOff();
+        colorSensor.lightOff();*/
+        driveTrain.strafeToDistance(10,1,5);
     }
 }

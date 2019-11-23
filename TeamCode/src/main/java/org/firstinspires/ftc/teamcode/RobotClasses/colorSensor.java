@@ -28,14 +28,14 @@ public class colorSensor {
 
     private LinearOpMode currentOpMode;
 
-    private ModernRoboticsI2cColorSensor rSense;
+    private ModernRoboticsI2cColorSensor rSensor;
 
 
 
     public void init(HardwareRobot robot, LinearOpMode opMode){
 
         currentOpMode = opMode;
-        rSense = robot.rSense;
+        rSensor = robot.rSensor;
 
 
 
@@ -43,21 +43,28 @@ public class colorSensor {
 
 
     public void lightOn(){
-        rSense.enableLed(true);
+        rSensor.enableLed(true);
     }
 
     public void lightOff(){
-        rSense.enableLed(false);
+        rSensor.enableLed(false);
     }
 
     public boolean checkColor(){
-        if (rSense.red() > 50){
-            currentOpMode.telemetry.addData("redValue", rSense.red());
+        if (rSensor.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER) > 6 && rSensor.readUnsignedByte(ModernRoboticsI2cColorSensor.Register.COLOR_NUMBER) < 10){
+            return true;
+        }
+        return false;
+    }
+
+    /*public boolean checkColor(){
+        if (rSensor.red() > 50){
+            currentOpMode.telemetry.addData("redValue", rSensor.red());
             return true;
 
         }
 
         return false;
 
-    }
+    }*/
 }

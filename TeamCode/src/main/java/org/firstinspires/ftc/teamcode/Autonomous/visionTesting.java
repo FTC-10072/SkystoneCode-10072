@@ -16,11 +16,17 @@ public class visionTesting extends LinearOpMode {
     private DriveTrain driveTrain = new DriveTrain();
     private Arm arm = new Arm();
     private ElapsedTime runtime = new ElapsedTime();
-    private SkystoneVision vision = new SkystoneVision(this);
+
 
     @Override
     public void runOpMode() throws InterruptedException {
-        vision.runVision();
+        robot.init(hardwareMap);
+        driveTrain.init(robot, this);
+        arm.init(robot, this);
+        driveTrain.initVuforia();
+        driveTrain.checkTfod();
+        driveTrain.initTfod();
+        waitForStart();
 
     }
 

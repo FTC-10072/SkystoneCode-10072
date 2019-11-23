@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotClasses;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import android.annotation.SuppressLint;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -12,7 +14,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.teamcode.RobotClasses.colorSensor;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cColorSensor;
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+
+import java.util.List;
+
 
 public class DriveTrain {
 
@@ -25,7 +35,30 @@ public class DriveTrain {
     Acceleration gravity;
     private double globalAngle;
 
-    colorSensor rSense = new colorSensor();
+    private ModernRoboticsI2cColorSensor rSensor;
+
+    //camera setup
+
+    private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
+    private static final String LABEL_FIRST_ELEMENT = "Stone";
+    private static final String LABEL_SECOND_ELEMENT = "Skystone";
+
+    private static final String VUFORIA_KEY =
+            "AVzoDpb/////AAAAGWOqlyM4q0e/ovBzcyWPJbJsX5E+9DUPAPHi4zWeGa9ug902P97K3rE7wuUk7aTBfC9tvAl1tjLh6FSQ87dXpu1Q0nkKq1AifYAQB6oGtqR4RMtOfTgB3KYTmlqHIZg4SkU78YMXTFr3Akwm2g/vumSNqrT5FQTzh8lQyLvPkdvJI+y8ddbW6faF2v9ARpb2LXi81e7BBMbEl+9LoIUrrOd+Bp2+TJ7NQK35HBq4YUBT/CYEMJZjksmljFUHqKknl8z524eeMlC17k4NbMZOFPJPxSbC3ZifRWHPUJY71FG+mC2tBig16u4bcVx0m44svL0DBWjLEE2F3QP6jEHId7Md4s9KBXV+jfNH8FJcznqH";
+
+    /**
+     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
+     * localization engine.
+     */
+    private VuforiaLocalizer vuforia;
+
+    /**
+     * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
+     * Detection engine.
+     */
+    private TFObjectDetector tfod;
+
+
 
     // Ku = 0.105
     // Tu = .866
@@ -54,6 +87,9 @@ public class DriveTrain {
         rightFrontMotor = robot.rightFrontMotor;
         rightBackMotor  = robot.rightBackMotor;
         horiMotor       = robot.horiMotor;
+
+        rSensor         = robot.rSensor;
+
 
 
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -125,7 +161,7 @@ public class DriveTrain {
         if (currentOpMode.opModeIsActive()) {
             int cpr = (int) (COUNTS_PER_INCH * .9);
             int move = distance * cpr;
-            double mechDrift = .9;
+            double mechDrift = .8;
 
             int newLeftFrontTarget = leftFrontMotor.getCurrentPosition() + move;
             int newLeftBackTarget = leftBackMotor.getCurrentPosition() - move;
@@ -233,13 +269,35 @@ public class DriveTrain {
 
     public void driveToStone(){
 
-        //while red is greater than 15 keep on moving
-        while (rSense.checkColor()){
-            leftFrontMotor.setPower(1);
-            leftBackMotor.setPower(1);
-            rightFrontMotor.setPower(1);
-            rightBackMotor.setPower(1);
+
+        if (tfod != null) {
+            // getUpdatedRecognitions() will return null if no new information is available since
+            // the last time that call was made.
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+            while (updatedRecognitions != null) {
+
+                currentOpMode.telemetry.addData("# Object Detected", updatedRecognitions.size());
+
+                // step through the list of recognitions and display boundary info.
+                int i = 0;
+                for (Recognition recognition : updatedRecognitions) {
+                    currentOpMode.telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                    currentOpMode.telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                            recognition.getLeft(), recognition.getTop());
+                    currentOpMode.telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                            recognition.getRight(), recognition.getBottom());
+                }
+                currentOpMode.telemetry.update();
+            }
+
+            tfod.shutdown();
         }
+
+        leftFrontMotor.setPower(0);
+        leftBackMotor.setPower(0);
+        rightFrontMotor.setPower(0);
+        rightBackMotor.setPower(0);
+
 
     }
 
@@ -412,5 +470,48 @@ public class DriveTrain {
         TURN_D = Math.abs(d);
         currentOpMode.telemetry.addData("PID", "%f, %f, %f", TURN_P, TURN_I, TURN_D);
         currentOpMode.telemetry.update();
+    }
+
+
+    /**
+     * Initialize the Vuforia localization engine.
+     */
+    public void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraDirection = CameraDirection.BACK;
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+    }
+
+    /**
+     * Initialize the TensorFlow Object Detection engine.
+     */
+    public void initTfod() {
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            int tfodMonitorViewId = currentOpMode.hardwareMap.appContext.getResources().getIdentifier(
+                    "tfodMonitorViewId", "id", currentOpMode.hardwareMap.appContext.getPackageName());
+            TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+            tfodParameters.minimumConfidence = 0.8;
+            tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+            tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+        }
+
+        else {
+            currentOpMode.telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
+    }
+
+    public void checkTfod(){
+        if (tfod != null) {
+            tfod.activate();
+        }
     }
 }

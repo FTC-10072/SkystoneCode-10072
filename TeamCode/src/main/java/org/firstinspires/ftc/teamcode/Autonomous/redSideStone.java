@@ -20,10 +20,10 @@ public class redSideStone extends LinearOpMode {
         robot.init(hardwareMap);
         driveTrain.init(robot, this);
         arm.init(robot, this);
+        driveTrain.initVuforia();
+        driveTrain.checkTfod();
         waitForStart();
 
-        driveTrain.driveToDistance(-18,3,.8);
-        driveTrain.turnToDegree(-90,.5,4);
-        driveTrain.driveToDistance(-24,4,.8);
+        driveTrain.driveToStone();
     }
 }
