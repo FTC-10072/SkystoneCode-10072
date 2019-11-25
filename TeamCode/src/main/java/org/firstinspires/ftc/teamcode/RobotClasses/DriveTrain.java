@@ -73,22 +73,22 @@ public class DriveTrain {
 
     private static final AxesOrder axes = AxesOrder.ZYX;
 
-    private static final int COUNTS_PER_REV = 1120; // count / rev
+    private static final int COUNTS_PER_REV = 1440; // count / rev
+    private static final int COUNTS_PER_REV2 =  1680;
     private static final double WHEEL_DIAMETER = 4.0; // inches
     private static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * 3.141592; // distance / rev
+    private static final double COUNTS_PER_INCH2 = COUNTS_PER_REV2/WHEEL_CIRCUMFERENCE;
     private static final double COUNTS_PER_INCH = COUNTS_PER_REV / WHEEL_CIRCUMFERENCE;
 
     public DriveTrain(){}
 
-    public void init(HardwareRobot robot, LinearOpMode opMode){
+    public void init(HDriveHardwareRobot robot, LinearOpMode opMode){
         currentOpMode   = opMode;
         leftFrontMotor  = robot.leftFrontMotor;
         leftBackMotor   = robot.leftBackMotor;
         rightFrontMotor = robot.rightFrontMotor;
         rightBackMotor  = robot.rightBackMotor;
         horiMotor       = robot.horiMotor;
-
-        rSensor         = robot.rSensor;
 
 
 
@@ -157,7 +157,7 @@ public class DriveTrain {
         return false;
     }
 
-    public boolean strafeToDistance(int distance, double speed, double timeout){
+    /*public boolean strafeToDistance(int distance, double speed, double timeout){
         if (currentOpMode.opModeIsActive()) {
             int cpr = (int) (COUNTS_PER_INCH * .9);
             int move = distance * cpr;
@@ -201,6 +201,38 @@ public class DriveTrain {
 
 
 
+
+    }*/
+
+    public boolean strafeToDistance(double targetDistance, double timeout, double power){
+        if(currentOpMode.opModeIsActive()) {
+            assert timeout > 0;
+            // set new target position
+            int newLeftFrontTarget = leftFrontMotor.getCurrentPosition() + (int) (COUNTS_PER_INCH2 * targetDistance);
+
+            horiMotor.setTargetPosition(newLeftFrontTarget);
+
+
+            horiMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+            // reset time
+            ElapsedTime time = new ElapsedTime();
+            // loop until diff is within precision or timeout
+            while (currentOpMode.opModeIsActive() && time.seconds() < timeout
+                    && horiMotor.isBusy()) {
+                // set power with correction
+                horiMotor.setPower(power);
+            }
+            // check if finished
+            if (time.seconds() > timeout) return false;
+            // stop motors
+            setLeftPower(0.0, 0.0);
+            setRightPower(0.0, 0.0);
+            // return that it ended under timeout
+            return true;
+        }
+        return false;
 
     }
     //probably a better turning alg

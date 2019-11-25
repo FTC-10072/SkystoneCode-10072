@@ -60,10 +60,10 @@ public class Arm {
 
 
     public void dropgripper(){
-        gripperServo.setPosition(.3);
+        gripperServo.setPosition(1);
     }
     public void raisegripper(){
-        gripperServo.setPosition(1);
+        gripperServo.setPosition(.5);
     }
 
 

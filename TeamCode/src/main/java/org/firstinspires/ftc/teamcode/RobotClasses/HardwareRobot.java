@@ -24,6 +24,24 @@ public class HardwareRobot {
 
     public HardwareRobot(){}
 
+    public void initMotor(DcMotor motor, int direction){
+        if (direction > 0){
+            motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        }
+
+        else if (direction < 0){
+            motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
+
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor.setPower(0);
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+    }
+
     public void init(HardwareMap ahwMap){
         hwMap = ahwMap;
 
@@ -40,9 +58,16 @@ public class HardwareRobot {
 
 
 
+        initMotor(leftFrontMotor, -1);
+        initMotor(leftBackMotor,-1);
+        initMotor(rightFrontMotor,1);
+        initMotor(rightBackMotor,1);
+        initMotor(intakeMotor1, 1);
+        initMotor(intakeMotor2,-1);
+        initMotor(worstMotor,-1);
+        initMotor(horiMotor, 1);
 
-
-
+        /*
         leftFrontMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBackMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightFrontMotor.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -93,7 +118,7 @@ public class HardwareRobot {
         intakeMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         worstMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         horiMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+        */
         // set up servos
 
         gripperServo = hwMap.get(Servo.class, "gripper_servo");
